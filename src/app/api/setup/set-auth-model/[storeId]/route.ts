@@ -51,6 +51,7 @@ const authModel: any = {
 				relations: {
 					owner: { directly_related_user_types: [{ type: "user" }] },
 					parent_organization: { directly_related_user_types: [{ type: "organization" }] },
+					viewer: { directly_related_user_types: [{ type: "user" }] },
 				},
 			},
 		},

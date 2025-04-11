@@ -5,6 +5,7 @@ const STORAGE_KEY = "admin_resources";
 
 export function useResourceStore() {
 	const [resources, setResources] = useState<Resource[]>([]);
+	console.log("resources: ", resources);
 
 	useEffect(() => {
 		const stored = localStorage.getItem(STORAGE_KEY);
