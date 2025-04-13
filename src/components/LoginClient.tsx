@@ -43,7 +43,7 @@ export default function LoginClient() {
 
 	const signIn = (user: User) => {
 		// Use the login method from context with appropriate userId format
-		const userId = user.role === "admin" ? "user:admin" : "user:alice";
+		const userId = user.role === "admin" ? "user:admin@example.com" : "user:user@example.com";
 		login(userId);
 
 		// Navigate based on role

@@ -1,48 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-type StoreInfo = {
-	id: string;
-};
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 export default function OpenFGASetupManager() {
-	const [store, setStore] = useState<StoreInfo | null>(null);
+	const { storeId, setStoreId } = useAuth();
 	const [modelExists, setModelExists] = useState(false);
 	const [loading, setLoading] = useState(false);
 
-	const checkStore = async () => {
-		try {
-			const res = await fetch("/api/setup/check-store");
-			const data = await res.json();
-			if (data.store) {
-				setStore(data.store);
-			}
-		} catch (err) {
-			console.error("Error checking store:", err);
-		}
-	};
-
-	// Check for store on mount
-	useEffect(() => {
-		checkStore();
-	}, []);
-
 	// If store exists, check model
-	useEffect(() => {
-		if (!store) return;
-
-		const checkModel = async () => {
-			try {
-				const res = await fetch(`/api/setup/check-model/${store.id}`);
-				const data = await res.json();
-				setModelExists(data.exists);
-			} catch (err) {
-				console.error("Error checking model:", err);
-			}
-		};
-		checkModel();
-	}, [store]);
 
 	const handleCreateStore = async () => {
 		setLoading(true);
@@ -50,8 +16,12 @@ export default function OpenFGASetupManager() {
 			const res = await fetch("/api/setup/create-store", {
 				method: "POST",
 			});
+			if (!res.ok || res.status === 500) {
+				alert("Error creating store, make sure you have the OpenFGA server running");
+				return;
+			}
 			const data = await res.json();
-			setStore({ id: data.storeId });
+			setStoreId(data.storeId);
 		} catch (err) {
 			console.error("Failed to create store:", err);
 		} finally {
@@ -60,17 +30,21 @@ export default function OpenFGASetupManager() {
 	};
 
 	const handleCreateModel = async () => {
-		if (!store) return;
+		if (!storeId) return;
 		setLoading(true);
 		try {
-			const res = await fetch(`/api/setup/set-auth-model/${store.id}`, {
+			const res = await fetch(`/api/setup/set-auth-model`, {
 				method: "POST",
+				body: JSON.stringify({
+					storeId: storeId,
+				}),
 			});
 			if (res.ok) {
 				setModelExists(true);
-			}
+			} else alert("Error creating model, make sure you have the OpenFGA server running");
 		} catch (err) {
 			console.error("Failed to create model:", err);
+			alert("Failed to create model: " + err);
 		} finally {
 			setLoading(false);
 		}
@@ -80,16 +54,16 @@ export default function OpenFGASetupManager() {
 		<div className='p-6 rounded-xl shadow-lg bg-white max-w-xl mx-auto mt-10'>
 			<h2 className='text-2xl font-bold mb-4'>OpenFGA Setup Manager</h2>
 
-			{!store && (
+			{!storeId && (
 				<button onClick={handleCreateStore} disabled={loading} className='bg-blue-600 text-white px-4 py-2 rounded-md'>
 					{loading ? "Creating Store..." : "Create Store"}
 				</button>
 			)}
 
-			{store && (
+			{storeId && (
 				<>
 					<div className='mb-4'>
-						✅ Store ID: <code>{store.id}</code>
+						✅ Store ID: <code>{storeId}</code>
 					</div>
 
 					{!modelExists ? (
@@ -100,7 +74,7 @@ export default function OpenFGASetupManager() {
 							{loading ? "Creating Model..." : "Create Authorization Model"}
 						</button>
 					) : (
-						<div>✅ Authorization model exists.</div>
+						<div>✅ Authorization model created.</div>
 					)}
 				</>
 			)}

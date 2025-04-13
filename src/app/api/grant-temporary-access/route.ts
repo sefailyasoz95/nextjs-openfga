@@ -1,54 +1,61 @@
 import { NextResponse } from "next/server";
-import fgaClient from "@/lib/fga";
+import { OpenFgaClient } from "@openfga/sdk";
 
 export async function POST(req: Request) {
 	try {
-		const { user, duration, grantedBy } = await req.json();
+		const { user, duration, grantedBy, storeId, objectId } = await req.json();
 
-		// Validate inputs
-		if (!user || !duration) {
-			return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+		if (!user || !duration || !storeId || !objectId) {
+			return NextResponse.json(
+				{ error: "Missing required fields: user, duration, storeId, objectId" },
+				{ status: 400 }
+			);
 		}
 
-		// Write tuple to grant temporary admin access
-		await fgaClient.write({
+		const fga = new OpenFgaClient({
+			apiUrl: "http://localhost:8080",
+			storeId,
+		});
+
+		const formattedUser = user.startsWith("user:") ? user : `user:${user}`;
+		const object = `user_restricted:${objectId}`;
+
+		// Grant access
+		await fga.write({
 			writes: [
 				{
-					user: user, // e.g. "user:bob"
+					user: formattedUser,
 					relation: "temp_access",
-					object: "user_restricted:all", // This is a special object that represents all user resources
+					object,
 				},
 			],
 		});
 
-		// Set up server-side expiration
 		setTimeout(async () => {
 			try {
-				// Delete the tuple when the duration expires
-				await fgaClient.write({
+				await fga.write({
 					deletes: [
 						{
-							user: user,
+							user: formattedUser,
 							relation: "temp_access",
-							object: "user_restricted:all",
+							object,
 						},
 					],
 				});
-				console.log(`Temporary admin access for ${user} has expired and been revoked`);
+				console.log(`[TEMP ACCESS REVOKED] ${formattedUser} for ${object}`);
 			} catch (error) {
-				console.error("Error revoking temporary access:", error);
+				console.error("Failed to revoke access:", error);
 			}
 		}, duration);
 
-		// Log the action
-		console.log(`Temporary admin access granted to ${user} by ${grantedBy} for ${duration}ms`);
+		console.log(`[TEMP ACCESS GRANTED] ${formattedUser} by ${grantedBy} for ${duration}ms`);
 
 		return NextResponse.json({
 			success: true,
-			message: `Temporary admin access granted to ${user}`,
+			message: `Temporary access granted to ${formattedUser}`,
 		});
 	} catch (error) {
-		console.error("Error granting temporary access:", error);
-		return NextResponse.json({ error: "Failed to grant temporary access" }, { status: 500 });
+		console.error("Unexpected error in grant-temporary-access:", error);
+		return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
 	}
 }

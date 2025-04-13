@@ -1,7 +1,5 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 type DurationOption = {
@@ -17,7 +15,7 @@ const durationOptions: DurationOption[] = [
 ];
 
 export default function TemporaryAdminAccess() {
-	const { userId } = useAuth();
+	const { userId, storeId } = useAuth();
 	const [targetUser, setTargetUser] = useState("");
 	const [selectedDuration, setSelectedDuration] = useState<number>(durationOptions[0].value);
 	const [activeGrants, setActiveGrants] = useState<Array<{ user: string; expiresAt: number; timerId: NodeJS.Timeout }>>(
@@ -70,6 +68,7 @@ export default function TemporaryAdminAccess() {
 					user: formattedUserId,
 					duration: selectedDuration,
 					grantedBy: userId,
+					storeId,
 				}),
 			});
 

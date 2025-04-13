@@ -1,8 +1,8 @@
 import OpenFGASetupManager from "@/components/OpenFGASetupManager";
-import ResourceSectionClient from "@/components/ResourceSectionClient";
 import TemporaryAdminAccess from "@/components/TemporaryAdminAccess";
 import AccessGuard from "@/components/AccessGuard";
 import { getResourcesByType } from "@/lib/resources";
+import ResourceSection from "@/components/ResourceSection";
 
 export default async function AdminDashboard() {
 	// Fetch resources on the server
@@ -19,8 +19,8 @@ export default async function AdminDashboard() {
 
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-6 mt-6'>
 					{/* Use client components with server-fetched initial data */}
-					<ResourceSectionClient title='Admin Restricted' initialResources={adminResources} type='admin_restricted' />
-					<ResourceSectionClient title='User Restricted' initialResources={userResources} type='user_restricted' />
+					<ResourceSection title='Admin Restricted' resources={adminResources} />
+					<ResourceSection title='User Restricted' resources={userResources} />
 				</div>
 			</div>
 		</AccessGuard>

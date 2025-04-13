@@ -1,17 +1,21 @@
+import { OpenFgaClient } from "@openfga/sdk";
 import { NextResponse } from "next/server";
-import fgaClient from "@/lib/fga";
 
 export async function POST(req: Request) {
 	try {
-		const { user, revokedBy } = await req.json();
+		const { user, revokedBy, storeId } = await req.json();
 
 		// Validate inputs
 		if (!user) {
 			return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 		}
 
+		const fga = new OpenFgaClient({
+			apiUrl: "http://localhost:8080",
+			storeId,
+		});
 		// Delete the tuple to revoke temporary access
-		await fgaClient.write({
+		await fga.write({
 			deletes: [
 				{
 					user: user,

@@ -7,7 +7,7 @@ export async function POST() {
 		const client = new OpenFgaClient({ apiUrl: "http://localhost:8080" });
 
 		const response = await client.createStore({
-			name: "MyTodoAppStore",
+			name: "smartface",
 		});
 
 		return NextResponse.json({ storeId: response.id });

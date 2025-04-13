@@ -1,12 +1,24 @@
-import { fgaClient } from "@/lib/fga";
+import { OpenFgaClient } from "@openfga/sdk";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-	const { user, relation, resource } = await req.json();
-	const allowed = await fgaClient.check({
-		user,
-		relation,
-		object: resource,
-	});
-	return NextResponse.json({ allowed: allowed.allowed });
+	const { user, relation, object, storeId } = await req.json();
+	try {
+		const fga = new OpenFgaClient({
+			apiUrl: "http://localhost:8080",
+			storeId,
+		});
+
+		const allowed = await fga.check({
+			user,
+			relation,
+			object,
+		});
+		console.log("allowed: ", allowed);
+		return NextResponse.json({ allowed: allowed.allowed });
+	} catch (error) {
+		console.log("error: ", error);
+
+		return NextResponse.json({ allowed: false });
+	}
 }

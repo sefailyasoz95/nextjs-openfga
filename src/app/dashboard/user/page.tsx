@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 import ResourceSection from "@/components/ResourceSection";
-import ResourceSectionClient from "@/components/ResourceSectionClient";
 import AccessGuard from "@/components/AccessGuard";
 import { getResourcesByType } from "@/lib/resources";
 import { useAuth } from "@/hooks/useAuth";
 import { Resource } from "@/lib/types";
 
 export default function UserDashboard() {
-	const { userId, isAuthenticated } = useAuth();
+	const { isAuthenticated, authorizedAsAdmin } = useAuth();
 	const [userResources, setUserResources] = useState<Resource[]>([]);
 	const [adminResources, setAdminResources] = useState<Resource[]>([]);
 
@@ -29,10 +28,8 @@ export default function UserDashboard() {
 				<h1 className='text-2xl font-bold mb-4'>User Dashboard</h1>
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 					{/* Use client component with client-fetched data */}
-					<ResourceSectionClient title='Your Resources' initialResources={userResources} type='user_restricted' />
-					{isAuthenticated && (
-						<ResourceSectionClient title='Admin Resources' initialResources={adminResources} type='admin_restricted' />
-					)}
+					<ResourceSection title='Your Resources' resources={userResources} />
+					{authorizedAsAdmin && <ResourceSection title='Admin Resources' resources={adminResources} />}
 				</div>
 			</div>
 		</AccessGuard>
