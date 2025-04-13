@@ -14,6 +14,7 @@ export default function AccessGuard({ children }: AccessGuardProps) {
 
 	useEffect(() => {
 		// If not authenticated, redirect to home page
+
 		if (!isAuthenticated) {
 			router.push("/");
 		}

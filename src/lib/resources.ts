@@ -2,7 +2,7 @@ import { Resource } from "./types";
 
 export async function getResources(): Promise<Resource[]> {
 	// This would typically fetch from a database or API
-	// For now, we'll use static data similar to what's in localStorage
+	// For now, using static data
 	const resources: Resource[] = [
 		{ id: "folder:reports", name: "Reports Folder", type: "user_restricted" },
 		{ id: "folder:marketing", name: "Marketing Folder", type: "admin_restricted" },

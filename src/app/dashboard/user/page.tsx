@@ -1,37 +1,17 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import ResourceSection from "@/components/ResourceSection";
-import AccessGuard from "@/components/AccessGuard";
 import { getResourcesByType } from "@/lib/resources";
-import { useAuth } from "@/hooks/useAuth";
-import { Resource } from "@/lib/types";
+import ResourcesForUserDashboard from "@/components/ResourcesForUserDashboard";
+import ResourceSection from "@/components/ResourceSection";
 
-export default function UserDashboard() {
-	const { isAuthenticated, authorizedAsAdmin } = useAuth();
-	const [userResources, setUserResources] = useState<Resource[]>([]);
-	const [adminResources, setAdminResources] = useState<Resource[]>([]);
-
-	useEffect(() => {
-		// Fetch user resources
-		getResourcesByType("user_restricted").then(setUserResources);
-
-		// Only fetch admin resources if user is authenticated
-		if (isAuthenticated) {
-			getResourcesByType("admin_restricted").then(setAdminResources);
-		}
-	}, [isAuthenticated]);
+export default async function UserDashboard() {
+	const userResources = await getResourcesByType("user_restricted");
 
 	return (
-		<AccessGuard>
-			<div className='p-6'>
-				<h1 className='text-2xl font-bold mb-4'>User Dashboard</h1>
-				<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-					{/* Use client component with client-fetched data */}
-					<ResourceSection title='Your Resources' resources={userResources} />
-					{authorizedAsAdmin && <ResourceSection title='Admin Resources' resources={adminResources} />}
-				</div>
+		<div className='p-6'>
+			<h1 className='text-2xl font-bold mb-4'>User Dashboard</h1>
+			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+				<ResourceSection title='Your Resources' resources={userResources} />
+				<ResourcesForUserDashboard />
 			</div>
-		</AccessGuard>
+		</div>
 	);
 }

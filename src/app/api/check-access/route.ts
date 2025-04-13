@@ -17,8 +17,6 @@ export async function POST(req: Request) {
 		console.log("allowed: ", allowed);
 		return NextResponse.json({ allowed: allowed.allowed });
 	} catch (error) {
-		console.log("error: ", error);
-
 		return NextResponse.json({ allowed: false });
 	}
 }

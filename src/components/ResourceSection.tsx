@@ -1,6 +1,5 @@
-// components/ResourceSection.tsx
 import ResourceCard from "./ResourceCard";
-import { Resource } from "@/lib/types"; // assume you have a Resource type
+import { Resource } from "@/lib/types";
 
 type Props = {
 	title: string;

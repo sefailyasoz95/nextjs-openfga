@@ -17,10 +17,6 @@ type AuthContextType = {
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
-type StoreInfo = {
-	id: string;
-};
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [userId, setUserId] = useState("");
 	const [authorizedAsAdmin, setAuthorizedAsAdmin] = useState(false);
@@ -72,10 +68,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		} else {
 			setAuthorizedAsAdmin(false);
 		}
+		return;
 	};
 
 	useEffect(() => {
 		const isAuthenticated = !!userId;
+
 		const isProtectedRoute = pathname?.includes("/dashboard");
 
 		if (!isAuthenticated && isProtectedRoute) {
