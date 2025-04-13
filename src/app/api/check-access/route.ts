@@ -14,7 +14,6 @@ export async function POST(req: Request) {
 			relation,
 			object,
 		});
-		console.log("allowed: ", allowed);
 		return NextResponse.json({ allowed: allowed.allowed });
 	} catch (error) {
 		return NextResponse.json({ allowed: false });

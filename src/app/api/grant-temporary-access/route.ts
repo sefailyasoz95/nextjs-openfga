@@ -42,20 +42,14 @@ export async function POST(req: Request) {
 						},
 					],
 				});
-				console.log(`[TEMP ACCESS REVOKED] ${formattedUser} for ${object}`);
-			} catch (error) {
-				console.error("Failed to revoke access:", error);
-			}
+			} catch (error) {}
 		}, duration);
-
-		console.log(`[TEMP ACCESS GRANTED] ${formattedUser} by ${grantedBy} for ${duration}ms`);
 
 		return NextResponse.json({
 			success: true,
 			message: `Temporary access granted to ${formattedUser}`,
 		});
 	} catch (error) {
-		console.error("Unexpected error in grant-temporary-access:", error);
 		return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
 	}
 }
